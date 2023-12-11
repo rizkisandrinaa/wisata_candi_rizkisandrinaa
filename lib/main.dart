@@ -21,10 +21,10 @@ class MyApp extends StatelessWidget {
       onGenerateRoute: (settings) {
 
       },
-      initialRoute: '/sign_up',
+      initialRoute: '/',
       routes: {
         '/': (context) => MainScreen(),
-        //'/detail': (context) => DetailScreen(candi: candi),
+        // '/detail': (context) => DetailScreen(candi: candi),
         '/sign_in': (context) => SignInScreen(),
         '/sign_up': (context) => SignUpScreen(),
       },

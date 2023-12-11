@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignUpScreen extends StatefulWidget {
   SignUpScreen({super.key});
@@ -17,44 +18,52 @@ class _SignUpScreenState extends State<SignUpScreen> {
   String _errorText = '';
   bool _obscurePassword = true;
 
-  void _signup() async{
+  // TODO: 1. Membuat metode sign up
+  void _signUp() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     String name = _fullnameController.text.trim();
     String username = _usernameController.text.trim();
     String password = _passwordController.text.trim();
 
     if(password.length < 8 ||
-    ! password.contains(RegExp(r'[A-Z]'))||
-        ! password.contains(RegExp(r'[a-z]'))||
-        ! password.contains(RegExp(r'[0-9]'))||
-        ! password.contains(RegExp(r'[!@#$%^&*():{}<>]'))
-    ){
+        !password.contains(RegExp(r'[A-Z]')) ||
+        !password.contains(RegExp(r'[a-z]')) ||
+        !password.contains(RegExp(r'[0-9]')) ||
+        !password.contains(RegExp(r'[!@#$%^&*():{}<>]'))) {
       setState(() {
-        _errorText = 'Minimal 8 karakter, kombinasi [A-Z][a-z] [0-9] !@#\\\$%^&*():{}<>';
+        _errorText = 'Minimal 8 karakter, kombinasi [A-Z], [a-z], [0-9], !@#\\\$%^&*():{}<>';
       });
       return;
     };
-    print('*** Sign up berhasil');
-    print('fullname: $name');
-    print('username: $username');
-    print('password: $password');
 
+    try {
+      prefs.setString('fulname', name);
+      prefs.setString('username', username);
+      prefs.setString('password', password);
+    } catch (e) {
+      print('Terjadi kesalahan: $e');
+    }
 
+    Navigator.pushReplacementNamed(context, '/sign_in');
   }
 
-  //TODO.2 Membuat metode dispose
+  // TODO: 2. Membuat metode dispose
   @override
-  void dispose(){
-    //TODO: implement dspose
+  void dispose() {
+    // TODO: implement dispose
     _fullnameController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
+    super.dispose();
   }
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
       // TODO: 2 Pasang AppBar
-      appBar: AppBar(title: Text('Sign Up'),),
+      appBar: AppBar(
+        title: Text('Sign Up'),
+      ),
       // TODO: 3 Pasang body
       body: Center(
         child: SingleChildScrollView(
@@ -88,33 +97,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       controller: _passwordController,
                       decoration: InputDecoration(
                           labelText: "Kata Sandi",
-                          errorText: _errorText.isNotEmpty
-                              ? _errorText : null,
+                          errorText: _errorText.isNotEmpty ? _errorText : null,
                           border: OutlineInputBorder(),
                           suffixIcon: IconButton(
-                            onPressed: (){
+                            onPressed: () {
                               setState(() {
                                 _obscurePassword = !_obscurePassword;
                               });
                             },
-                            icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility
-                            ),
-                          )
-                      ),
+                            icon: Icon(_obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility),
+                          )),
                       obscureText: _obscurePassword,
                     ),
                     // TODO: 7 Pasang ElevatedButton Sign Up
                     SizedBox(height: 20),
                     ElevatedButton(
-                        onPressed: _signup,
-                        child: Text('Sign Up')
-                    ),
+                        onPressed: _signUp,
+                        child: Text('Sign Up')),
                   ],
-                )
-            ),
+                )),
           ),
         ),
       ),
